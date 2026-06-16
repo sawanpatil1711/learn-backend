@@ -1,12 +1,25 @@
-//require('dotenv').config({path: './.env'})
+//require('dotenv').config({path: './.env'}) use to import .env variable in nodejs
+
 import dotenv from 'dotenv';
 import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
 dotenv.config({
     path: './.env'
 });
 
-connectDB();
+connectDB()
+.than(()=>{
+    app.on("error", (error)=>{
+        console.error("Error occurred in the app:", error);
+    })
+    app.listen(process.env.PORT || 8000 , ()=>{
+        console.log(`Server is listening at port ${process.env.PORT}`);
+    })
+})
+.catch((error)=>{
+    console.log("Error connecting to MongoDB:", error);
+})
 
 
 
@@ -16,6 +29,8 @@ connectDB();
 
 
 /*
+import mongoose from 'mongoose';
+import {DB_NAME} from '../constants.js';
 import express from "express";
 const app = express();
 (async()=>{
