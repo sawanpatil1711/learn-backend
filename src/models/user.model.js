@@ -51,15 +51,15 @@ const userSchema = new mongoose.Schema(
 )
 
 userSchema.pre('save', async function (next) {
-    if(!this.isModifyed("password")) return next()
+    if(!this.isModified("password")) return next()
 
-    this.password = bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10)
     next()
-})
+}) // Hash the password before saving it to the database
 
 userSchema.methods.isPasswordCorrect = async function(password) {
    return await bcrypt.compare(password, this.password)
-}
+} // Compare the provided password with the hashed password in the database
 
 userSchema.methods.generateAccessToken = function(){
     return jwt.sign(
@@ -73,9 +73,9 @@ userSchema.methods.generateAccessToken = function(){
            expiresIn : process.env.ACCESS_TOKEN_EXPIRATION
         }
     )
-}
+} // Generate an access token for the user
 
-userSchema.methods.generateRefrenshToken = function(){
+userSchema.methods.generateRefreshToken = function(){
     return jwt.sign(
         {
             _id : this._id,
@@ -85,6 +85,6 @@ userSchema.methods.generateRefrenshToken = function(){
            expiresIn : process.env.REFRESH_TOKEN_EXPIRATION
         }
     )
-}
+} //
 
 export const User = mongoose.model('User', userSchema)

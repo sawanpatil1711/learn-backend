@@ -14,18 +14,18 @@ const videoSchema = new mongoose.Schema(
         title: {
             type: String,
             required: true,
-        },
+        }, 
         discription: {
             type: String,
             required: true,
         },
         duration:{
-            type: Number,
+            type: Number, //cloudinary
             required: true,
         },
         views: {
             type: Number,
-            defalut: 0
+            default: 0
         },
         isPublic: {
             type: Boolean,
