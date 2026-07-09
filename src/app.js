@@ -13,4 +13,9 @@ app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(express.static('public'))
 app.use(cookieParser())
 
+// Importing the user router and mounting it on the /api/v1/users path
+import userRouter from './routes/user.router.js'
+
+app.use('/api/v1/users', userRouter)
+
 export { app }
