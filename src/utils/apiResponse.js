@@ -1,4 +1,4 @@
-class response{ 
+class ApiResponse{ 
     constructor(
         statusCode,
         data,
@@ -11,3 +11,5 @@ class response{
         this.message = message;
     }
 }
+
+export { ApiResponse }
