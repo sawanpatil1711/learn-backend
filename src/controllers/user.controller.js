@@ -7,7 +7,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 const registerUser = asyncHandler( async (req,res) => {
     // get the user data from the request body
     const {username, fullname, email, password} = req.body
-    console.log("username :", username)
+    console.log('username:', username)
 
     // not empty fields
      
@@ -31,7 +31,13 @@ const registerUser = asyncHandler( async (req,res) => {
 
     //check if avatar and coverImage are uploaded
     const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path
+    let coverImageLocalPath = ""
+    if(req.files && req.files.coverImage && req.files.coverImage.length > 0) {
+       coverImageLocalPath = req.files.coverImage[0].path
+    }
+
+    //console.log("req.files:", req.files)
 
     if(!avatarLocalPath){
         throw new ApiError(400, 'Please upload an avatar image')
@@ -52,7 +58,7 @@ const registerUser = asyncHandler( async (req,res) => {
         email,
         password,
         avatar: avatar.url,
-        coverImage: coverImage?.url || null
+        coverImage: coverImage?.url || ""
     })
 
     // remove password and refreshToken from the user object before sending the response
