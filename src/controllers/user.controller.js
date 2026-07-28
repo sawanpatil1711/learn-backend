@@ -18,8 +18,9 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 
     }catch (error) {
-        throw new ApiError(500, 'Error generating tokens')
-    }
+    console.error(error);
+    throw new ApiError(500, error.message);
+}
 }
 
 const registerUser = asyncHandler( async (req,res) => {
@@ -63,7 +64,7 @@ const registerUser = asyncHandler( async (req,res) => {
 
     //uploading avatar and coverImage to cloudinary
     const avatar = await uploadOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    const coverImage = coverImageLocalPath ? await uploadOnCloudinary(coverImageLocalPath) : null
     
     if(!avatar) {
         throw new ApiError(500, 'Error uploading avatar image')
@@ -97,7 +98,7 @@ const loginUser = asyncHandler( async (req,res) => {
     const {username, email, password} = req.body
     
     // check if username or email is provided
-    if(!username || !email){
+    if(!(username || email)){
         throw new ApiError(400, 'Please provide username or email')
     }
 
@@ -170,15 +171,15 @@ const logoutUser = asyncHandler( async (req,res) => {
     }
 
     // send the response
-    return res
+return res
     .status(200)
-    .cookie("accessToken", options)
-    .cookie("refreshToken", options)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
     .json(
         new ApiResponse(
             200,
             {}, 
-            'User logged in successfully'
+            'User logged out successfully'
         )
     )
 })
