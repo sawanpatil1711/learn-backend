@@ -237,6 +237,10 @@ const refreshAccessToken = asyncHandler( async (req, res)=>{
 const updatePassword = asyncHandler( async(req, res) => {
     const {oldPassword, newPassword} = req.body
 
+    if(!oldPassword || !newPassword){
+        throw new ApiError(400, "Please provide old and new password")
+    }
+
     const user = await User.findById(req.user?._id)
 
     if(!user){
