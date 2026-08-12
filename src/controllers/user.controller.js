@@ -359,6 +359,32 @@ const updateUserCoverImage = asyncHandler( async(req, res) => {
     )
 })
 
+const deleteUser = asyncHandler( async(req, res) => {
+    
+    const user = await User.findByIdAndDelete(req.user?._id)
+
+    if(!user){
+            throw new ApiError(404, user, "User not found or already deleted" )
+    }
+
+    const options = {
+        httpOnly: true, // to prevent XSS attacks
+        secure: true, // to ensure the cookie is only sent over HTTPS
+    }    
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(
+        new ApiResponse(
+            200,
+             { username: user.username},
+            'User deleted successfully'
+        )
+    )
+})
+
 const getUserChannelProfile = asyncHandler( async(req, res) => {
 
     const {username}= req.params
@@ -478,4 +504,4 @@ const getUserWatchHistory = asyncHandler( async(req, res) => {
     ) 
 })
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, updatePassword, getCurrentUser, updateUserDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, getUserWatchHistory }
+export { registerUser, loginUser, logoutUser, refreshAccessToken, updatePassword, getCurrentUser, updateUserDetails, updateUserAvatar, updateUserCoverImage, deleteUser, getUserChannelProfile, getUserWatchHistory }
