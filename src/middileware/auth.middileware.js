@@ -26,6 +26,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         next() // Call the next middleware or route handler
         
     } catch (error) {
-        throw new ApiError(500, 'Error in auth middleware')
+        throw new ApiError(500, error.message || 'Error in auth middleware')
     }
 })
