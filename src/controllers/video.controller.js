@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Video } from "../models/video.model.js";
+import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 
 const uploadVideo = asyncHandler(async (req, res)=>{
@@ -40,4 +41,54 @@ const uploadVideo = asyncHandler(async (req, res)=>{
     return res.status(201).json(new ApiResponse(201, videoData, "Video uploaded successfully"))
 })
 
-export {uploadVideo}
+const getAllVideos = asyncHandler(async (req, res)=>{
+    const {page = 1, limit = 10, query, sortBy="createdAt", sortType="desc", userId, username} = req.query;
+
+    try {
+
+        const filter = {
+            isPublic: true,
+        }
+
+        if(query){
+            filter.title = {
+                $regex: query,
+                $options: "i"
+            };
+        }
+
+        if(username){
+            const user = await User.findOne({username});
+            if(!user){
+                throw new ApiError(404, "User not found");
+            }
+            filter.creator = user._id;
+        } else if(userId){
+            filter.creator = userId;
+        }
+
+        const videos = await Video.find(filter)
+          .populate("creator", "username avatar")
+          .limit(Number(limit))
+          .sort({ [sortBy]: sortType === "asc" ? 1 : -1 })
+          .skip((Number(page) - 1) * Number(limit));
+        
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    videos,
+                    page: Number(page),
+                    limit: Number(limit),
+                },
+                "Videos fetched successfully"
+            )
+        )
+    } catch (error) {
+        throw new ApiError(500, error.message || "Error fetching videos");   
+    }
+})
+
+export {uploadVideo, getAllVideos}

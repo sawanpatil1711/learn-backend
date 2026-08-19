@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { uploadVideo } from "../controllers/video.controller.js";
+import { uploadVideo, getAllVideos } from "../controllers/video.controller.js";
 import { verifyJWT } from "../middileware/auth.middileware.js";
 import { upload } from "../middileware/multer.middileware.js";
 
@@ -17,5 +17,7 @@ router.route('/uploadVideo').post(upload.fields([
         maxCount: 1
     }
 ]),uploadVideo)
+
+router.route('/videos').get(getAllVideos)
 
 export default router
