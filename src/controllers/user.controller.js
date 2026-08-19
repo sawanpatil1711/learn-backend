@@ -1,7 +1,7 @@
 import {asyncHandler} from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/apiError.js';
 import { User } from '../models/user.model.js';
-import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import { uploadOnCloudinary, deleteFromCloudinary } from '../utils/cloudinary.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import jwt from "jsonwebtoken"
 import mongoose from 'mongoose';
@@ -79,7 +79,9 @@ const registerUser = asyncHandler( async (req,res) => {
         email,
         password,
         avatar: avatar.url,
-        coverImage: coverImage?.url || ""
+        avatarPublicId: avatar.public_id,
+        coverImage: coverImage?.url || "",
+        coverImagePublicId: coverImage?.public_id || ""
     })
 
     // remove password and refreshToken from the user object before sending the response
@@ -306,7 +308,15 @@ const updateUserAvatar = asyncHandler( async(req, res) => {
         throw new ApiError(400, 'Please upload an avatar image')
     }
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    const currentuser = await User.findById(req.user?._id)
+
+    if (currentuser?.avatarPublicId) {
+        await deleteFromCloudinary(currentuser.avatarPublicId)
+
+        console.log("Old avatar deleted from cloudinary")
+    }
+
+    const avatar = await uploadOnCloudinary(avatarLocalPath)    
 
     if(!avatar.url) {
         throw new ApiError(500, 'Error uploading avatar on cloudinary')
@@ -316,7 +326,8 @@ const updateUserAvatar = asyncHandler( async(req, res) => {
         req.user?._id,
         {
             $set: {
-                avatar: avatar.url
+                avatar: avatar.url,
+                avatarPublicId: avatar.public_id
             }
         },
         {new: true}
@@ -336,6 +347,14 @@ const updateUserCoverImage = asyncHandler( async(req, res) => {
         throw new ApiError(400, 'Please upload an CoverImage image')
     }
 
+    const currentuser = await User.findById(req.user?._id)
+
+    if (currentuser?.coverImagePublicId) {
+        await deleteFromCloudinary(currentuser.coverImagePublicId)
+
+        console.log("Old cover image deleted from cloudinary")
+    }
+
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
     if(!coverImage.url) {
@@ -346,7 +365,8 @@ const updateUserCoverImage = asyncHandler( async(req, res) => {
         req.user?._id,
         {
             $set: {
-                coverImage: coverImage.url
+                coverImage: coverImage.url,
+                coverImagePublicId: coverImage.public_id
             }
         },
         {new: true}
