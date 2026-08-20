@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { uploadVideo, getAllVideos } from "../controllers/video.controller.js";
+import { uploadVideo, getAllVideos, getVideoById, deleteVideoById, updateVideoById } from "../controllers/video.controller.js";
 import { verifyJWT } from "../middileware/auth.middileware.js";
 import { upload } from "../middileware/multer.middileware.js";
 
@@ -18,6 +18,12 @@ router.route('/uploadVideo').post(upload.fields([
     }
 ]),uploadVideo)
 
-router.route('/videos').get(getAllVideos)
+router.route('/').get(getAllVideos)
+
+router.route('/:videoId')
+.delete(deleteVideoById)
+.get(getVideoById)
+.patch(upload.single('thumbnail'),updateVideoById)
+
 
 export default router
