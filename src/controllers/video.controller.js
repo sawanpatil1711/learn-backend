@@ -182,7 +182,3 @@ const updateVideoById = asyncHandler(async (req, res)=>{
 })
 
 export {uploadVideo, getAllVideos, getVideoById, deleteVideoById, updateVideoById}
-
-
-
-    // const isPublic = req.body?.isPublic === 'false' ? false : true
