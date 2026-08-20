@@ -142,9 +142,9 @@ const updateVideoById = asyncHandler(async (req, res)=>{
 
     const {title, description, isPublic} = req.body
 
-    if(!title?.trim() || !description?.trim()){
-        throw new ApiError(400, "Title and description cannot be empty")
-    }    
+    // if(!title?.trim() || !description?.trim()){
+    //     throw new ApiError(400, "Title and description cannot be empty")
+    // }    
 
     const thumbnailLocalPath = req.file?.path;
 
@@ -167,8 +167,8 @@ const updateVideoById = asyncHandler(async (req, res)=>{
         videoId,
         {
             $set: {
-                title: title || currentVideo.title,
-                description: description || currentVideo.description,
+                title: title?.trim() || currentVideo.title,
+                description: description?.trim() || currentVideo.description,
                 isPublic: isPublic !== undefined ? isPublic === 'true' : currentVideo.isPublic,
                 thumbnail: thumbnail?.secure_url || currentVideo.thumbnail,
                 thumbnailPublicId: thumbnail?.public_id || currentVideo.thumbnailPublicId
