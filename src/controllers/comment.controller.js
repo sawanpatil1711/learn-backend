@@ -103,6 +103,10 @@ const updateComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
     const { newComment } = req.body
 
+    if(!newComment?.trim()){
+        throw new ApiError(400, "comment is empty");
+    }
+
     if (!mongoose.Types.ObjectId.isValid(commentId)) {
         throw new ApiError(400, "Invalid comment id");
     }
