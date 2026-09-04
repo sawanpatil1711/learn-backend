@@ -120,7 +120,7 @@ const addToPlaylist = asyncHandler( async (req, res) => {
     const video = await Video.findById(videoId)
 
     if(!video){
-        throw new ApiError(404, "video not found")
+        throw new ApiError(404, "video is not found")
     }
 
     const updatedPlaylist = await Playlist.findByIdAndUpdate(
